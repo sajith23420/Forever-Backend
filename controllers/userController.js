@@ -1,11 +1,21 @@
 import validator from "validator";
 import bcrypt from "bcrypt";
+import jwt from 'jsonwebtoken'
 import userModel from "../models/userModel.js";
 
+
+const createToken = (id) => {
+    return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "1d" });
+}
 
 
 //Route for user login
 const loginUser = async (req, res) => {
+    try{
+
+    }catch(error){
+        
+    }
 
 }
 
@@ -33,15 +43,19 @@ const registerUser = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         //creating user in database
-        const user = await userModel.create({
+        const newUser = new userModel({
             name,
             email,
             password: hashedPassword
         });
-        return res.json({ success: true, message: "User registered successfully" })
+        const user = await newUser.save();
+
+        const token = createToken(user._id)
+        res.json({success: true ,token})
 
     } catch (error) {
-        return res.json({ success: false, message: "Internal server error" })
+         console.log(error);
+         res.json({ success: false, message: "Internal server error" });
     }
 
 
